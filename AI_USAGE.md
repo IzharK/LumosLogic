@@ -4,7 +4,7 @@ This project was built with the assistance of AI tools as a productivity acceler
 
 ## AI Tools Used
 - **ChatGPT** — architecture planning, documentation drafting, refactoring guidance
-- **Cursor IDE** — boilerplate generation and inline code suggestions
+- **Google Antigravity** — boilerplate generation and inline code suggestions
 
 ---
 
@@ -34,7 +34,6 @@ AI assistance was used in the following areas:
 
 AI-generated output was accepted primarily for:
 
-- Repetitive boilerplate (Freezed models, JSON serialization, DTO mapping)
 - Initial Dio request setup
 - Basic ViewModel and repository skeletons
 - First-draft documentation
@@ -66,7 +65,7 @@ Several AI-generated parts were changed after review:
 Some AI suggestions were intentionally rejected:
 
 ### Bloc / Riverpod
-AI suggested using Bloc and Riverpod for state management.  
+AI suggested using Bloc OR Riverpod for state management.  
 I rejected this because the scope of this assignment (list, detail, offline cache) does not justify the complexity and boilerplate they introduce.  
 I used **Provider + ChangeNotifier**, which fits naturally with MVVM and keeps the codebase readable and easy to reason about.
 
