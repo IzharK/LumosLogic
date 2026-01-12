@@ -1,34 +1,45 @@
 # AI Usage Disclosure
 
-This project was built with the assistance of AI tools as a productivity aid, not as a replacement for engineering judgment.
+This project was built with the assistance of AI tools as a productivity accelerator, not as a replacement for engineering judgment or decision-making.
 
 ## AI Tools Used
-- ChatGPT (architecture planning, documentation drafting, refactoring)
-- Cursor IDE (boilerplate generation and code suggestions)
+- **ChatGPT** — architecture planning, documentation drafting, refactoring guidance
+- **Cursor IDE** — boilerplate generation and inline code suggestions
 
 ---
 
-## Where AI Was Used
+## Where AI Was Used (Files / Modules)
 
-AI was used in the following areas:
+AI assistance was used in the following areas:
 
-- Generating initial folder structure for Clean Architecture
-- Creating Freezed data models for API responses
-- Writing the first draft of Dio API service
-- Drafting repository skeletons
-- Writing README.md and this AI_USAGE.md
+- **Feature structure & MVVM scaffolding**
+  - `features/products/viewmodels/`
+  - `features/products/screens/`
+- **Data models**
+  - `features/products/models/` (Freezed + JSON serialization)
+- **Networking**
+  - `core/network/`
+  - `features/products/data_sources/product_remote_data_source.dart`
+- **Local cache**
+  - `features/products/data_sources/product_local_data_source.dart`
+- **Repository layer**
+  - `features/products/repository/product_repository.dart`
+- **Documentation**
+  - `README.md`
+  - `AI_USAGE.md`
 
 ---
 
 ## What AI Output Was Accepted
 
-I accepted AI-generated output when it:
-- Created repetitive boilerplate (Freezed models, JSON serialization)
-- Generated basic repository and data source interfaces
-- Scaffolded Flutter widget layouts
-- Drafted documentation text that I then refined
+AI-generated output was accepted primarily for:
 
-These outputs helped reduce time spent on mechanical coding.
+- Repetitive boilerplate (Freezed models, JSON serialization, DTO mapping)
+- Initial Dio request setup
+- Basic ViewModel and repository skeletons
+- First-draft documentation
+
+These are mechanical tasks where AI provides speed without impacting architectural correctness.
 
 ---
 
@@ -36,10 +47,17 @@ These outputs helped reduce time spent on mechanical coding.
 
 Several AI-generated parts were changed after review:
 
-- Pagination logic was incorrect in the first AI draft; it did not account for the `skip` parameter properly, so I rewrote the paging logic.
-- Error handling was initially too generic; I replaced it with a custom `AppException` hierarchy for better UI feedback.
-- The repository layer originally mixed caching and networking; I separated them into clean data sources to follow Clean Architecture.
-- ViewModels initially contained API calls directly; I refactored them to call UseCases instead.
+- **Pagination logic**  
+  The initial AI draft did not correctly handle the `skip` parameter from the DummyJSON API. I rewrote this logic to ensure proper page offsets and consistent pagination behavior.
+
+- **Error handling**  
+  AI initially returned raw Dio errors. I replaced this with a custom `AppException` abstraction so the UI could display clean, user-friendly error states.
+
+- **Repository boundaries**  
+  Some AI-generated ViewModels directly accessed API services. I refactored them to go through the repository layer to preserve MVVM separation.
+
+- **Offline behavior**  
+  AI initially treated caching as optional. I made caching part of the default data flow so offline support is guaranteed after a successful fetch.
 
 ---
 
@@ -47,35 +65,35 @@ Several AI-generated parts were changed after review:
 
 Some AI suggestions were intentionally rejected:
 
-- **Bloc / Riverpod**:  
-  AI suggested using Riverpod for state management.  
-  I rejected this because the project scope is intentionally small (list + detail + cache). Using Bloc/Riverpod would add unnecessary boilerplate and cognitive load.  
-  I chose **Provider + ChangeNotifier** to keep the architecture clean, readable, and aligned with the assignment’s “not a UI-heavy challenge” focus.
+### Bloc / Riverpod
+AI suggested using Bloc and Riverpod for state management.  
+I rejected this because the scope of this assignment (list, detail, offline cache) does not justify the complexity and boilerplate they introduce.  
+I used **Provider + ChangeNotifier**, which fits naturally with MVVM and keeps the codebase readable and easy to reason about.
 
-- **Global state management**:  
-  AI proposed using a global state container. I rejected this in favor of feature-scoped ViewModels to keep the architecture modular.
+### Global state containers
+AI proposed a single global store.  
+I rejected this in favor of **feature-scoped ViewModels**, which keeps concerns isolated and improves testability and maintainability.
 
-- **Choice of persistent storage solution**:  
-  AI initially proposed using Hive or Isar. I rejected this in favor of a little known but powerful Sembast as I have excellent experience with it. Also, the support for both Hive and Isar is really poor, whereas Sembast is regularly updated.
+### Storage choice (Hive / Isar)
+AI suggested Hive or Isar.  
+I rejected both in favor of **Sembast**, which I have used successfully in production. It is pure Dart, stable across platforms, and avoids native build issues while being more than fast enough for API caching.
 
 ---
 
 ## Example of Human Override
 
-One concrete example:
-
-AI originally generated a repository that always fetched from the network and only fell back to cache if an exception occurred.
+AI originally generated a repository that only loaded from the cache when a network error occurred.
 
 I changed this to:
-- Always save the last successful API response
-- Load from cache first when the app launches
-- Use network only to refresh data
+- Load cached data immediately when the app starts
+- Fetch fresh data from the network in the background
+- Update the cache when new data arrives
 
-This made the offline experience smoother and better aligned with real-world offline-first design.
+This provides a smoother offline-first experience and more closely matches real-world mobile app behavior.
 
 ---
 
 ## Summary
 
-AI was used as a productivity accelerator, but all architectural decisions, trade-offs, and final implementations were reviewed, modified, and approved by me.  
+AI was used to accelerate development, but all architecture, trade-offs, and final implementations were reviewed, modified, and decided by me.  
 I can explain and justify every major part of this codebase.
