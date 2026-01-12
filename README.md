@@ -4,60 +4,121 @@ A production-grade Flutter application demonstrating MVVM architecture, offline 
 
 ## Features
 
-- **Product List**: Paginated scrolling from DummyJSON API.
-- **Product Details**: Detailed view of products.
-- **Offline First**: Caches data using Sembast.
-  - "Network First" strategy for fresh data.
-  - Falls back to local cache on network error.
-- **MVVM Architecture**: Clear separation of concerns.
-- **Dependency Injection**: Using `get_it`.
-- **State Management**: Using `provider`.
+* **Product List**: Paginated scrolling from DummyJSON API.
+* **Product Details**: Detailed view of products.
+* **Offline First**: Caches data using Sembast.
 
-## Architecture
+  * "Network First" strategy for fresh data.
+  * Falls back to local cache on network error.
+* **MVVM Architecture**: Clear separation of concerns.
+* **Dependency Injection**: Using `get_it`.
+* **State Management**: Using `provider`.
+
+## Architecture Overview
 
 The project follows a strict MVVM pattern:
 
-`UI` -> `ViewModel` -> `Repository` -> `Data Sources` (Remote & Local)
+`UI (Screens)` → `ViewModels (ChangeNotifier)` → `Repository` → `Data Sources (Remote & Local)`
+
+This ensures that:
+
+* UI contains no business or data logic
+* ViewModels manage state and user actions
+* Repositories coordinate data from API and local cache
+* Data sources are responsible only for network and database access
 
 ### Folder Structure
+
 ```
 lib/
-  core/         # Core utilities (Network, Error, DI, DB)
+  core/         # Core utilities (Network, Error handling, DI, Database)
   features/
     products/   # Product Feature
-      models/       # Freezed Models
+      models/       # Freezed data models
       data_sources/ # Remote (Dio) & Local (Sembast)
-      repository/   # Data coordination
-      viewmodels/   # State management (ChangeNotifier)
-      screens/      # Widgets
+      repository/   # Data coordination and caching logic
+      viewmodels/   # Screen-level state (ChangeNotifier)
+      screens/      # Flutter UI widgets
 ```
 
-## Decisions & Trade-offs
+## Key Decisions & Trade-offs
 
-### Local Storage: Sembast
-I chose **Sembast** over Hive/Isar because:
-1.  **Reliability**: Sembast is pure Dart and extremely stable across all platforms without native dependencies.
-2.  **Support**: Hive 3.x has had long beta periods, and Isar can sometimes have complex build setup issues. Sembast offers an excellent balance of performance and simplicity for this use case.
-3.  **Experience**: I have extensive positive experience with Sembast in production apps.
+### Local Storage — Sembast
 
-### State Management: Provider
-Chosen for its simplicity and explicit requirement. It pairs perfectly with `ChangeNotifier` for per-screen ViewModels.
+I chose **Sembast** over Hive or Isar for the following reasons:
 
-## Setup
+1. **Reliability** — Sembast is pure Dart with no native bindings, making it stable across Android, iOS, and desktop.
+2. **Build Simplicity** — Hive 3.x and Isar often introduce build and codegen issues; Sembast avoids these completely.
+3. **Performance Fit** — For caching paginated API data, Sembast provides more than enough performance.
 
-1.  Clone the repo.
-2.  Run `flutter pub get`.
-3.  Run code generation:
-    ```bash
-    dart run build_runner build --delete-conflicting-outputs
-    ```
-4.  Run `flutter run`.
+### State Management — Provider
+
+Provider with `ChangeNotifier` was chosen because:
+
+* It fits naturally with MVVM
+* It avoids unnecessary boilerplate
+* It is easy to debug and reason about for this project’s scope
+
+More complex patterns such as Bloc or Riverpod were intentionally avoided to keep the architecture clear and maintainable.
+
+### Offline Strategy
+
+The app uses a **Network First, Cache Fallback** approach:
+
+* API is called whenever possible
+* Successful responses are saved to local storage
+* If the API fails, cached data is shown automatically
+
+This provides a realistic offline-first experience without unnecessary sync complexity.
+
+## Setup Instructions
+
+1. Clone the repository.
+2. Install dependencies:
+
+   ```bash
+   flutter pub get
+   ```
+3. Run code generation:
+
+   ```bash
+   dart run build_runner build --delete-conflicting-outputs
+   ```
+4. Run the app:
+
+   ```bash
+   flutter run
+   ```
+
+## Known Limitations
+
+* The cache stores only the last successfully fetched pages; it does not implement advanced cache invalidation.
+* No background refresh or sync scheduling is implemented.
+* UI is intentionally simple to focus on architecture and data flow.
+* The app does not support filtering or searching.
+
+## Screen Recording
+
+A short screen recording demonstrating the following flows is included in the `/screenshots` folder:
+
+* App launch with cached data
+* Loading state while fetching from network
+* Product list pagination
+* Product detail view
+* Error handling when network is unavailable
+
+https://github.com/user-attachments/assets/98806a06-31d8-43ef-9e64-078455e5e5f3
+The recording shows how the app behaves both online and offline to demonstrate the offline-first design.
+
+
+Please refer to the screenshots to see the list view, detail view, loading states, and offline behavior.
 
 ## Libraries Used
-- `dio`: Networking
-- `provider`: State Management
-- `get_it`: Service Locator
-- `freezed`: Immutable Data Classes
-- `sembast`: NoSQL Database (Offline Cache)
-- `cached_network_image`: Image caching
-- `json_serializable`: JSON parsing
+
+* `dio` — Networking
+* `provider` — State management
+* `get_it` — Dependency injection
+* `freezed` — Immutable data models
+* `json_serializable` — JSON parsing
+* `sembast` — Offline cache
+* `cached_network_image` — Image caching
