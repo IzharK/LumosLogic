@@ -108,6 +108,7 @@ A short screen recording demonstrating the following flows is included in the `/
 * Error handling when network is unavailable
 
 https://github.com/user-attachments/assets/98806a06-31d8-43ef-9e64-078455e5e5f3
+
 The recording shows how the app behaves both online and offline to demonstrate the offline-first design.
 
 
